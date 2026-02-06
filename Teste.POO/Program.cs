@@ -63,9 +63,10 @@ class Principal
             {
                 Console.Write("- Nota: ");
                 string input = Console.ReadLine();
-                if (input.ToLower() == "fim") break;
+                if (input == "fim" || input == "FIM") break;
 
-                if (double.TryParse(input, out double nota) && nota >= 0 && nota <= 10)
+                double nota;
+                if (double.TryParse(input, out nota) && nota >= 0 && nota <= 10)
                 {
                     aluno.Notas.Add(nota);
                 }
@@ -104,8 +105,8 @@ class Principal
             {
                 Console.Write("- Turma: ");
                 string turma = Console.ReadLine();
-                if (turma.ToLower() == "fim") break;
-                if (!string.IsNullOrWhiteSpace(turma)) prof.Turmas.Add(turma);
+                if (turma == "fim" || turma == "FIM") break;
+                if (turma != "" && turma != null) prof.Turmas.Add(turma);
             }
 
             escola.Add(prof);
@@ -121,9 +122,9 @@ class Principal
                 return;
             }
 
-            foreach (var p in escola)
+            for (int i = 0; i < escola.Count; i++)
             {
-                p.ExibirDados();
+                escola[i].ExibirDados();
             }
         }
 
@@ -131,24 +132,46 @@ class Principal
         {
             Console.WriteLine("--- ESTATÍSTICAS ---");
 
-            var alunos = escola.OfType<Aluno>().ToList();
-            var professores = escola.OfType<Professor>().ToList();
+            int qtdAlunos = 0;
+            int qtdProfessores = 0;
+            double somaNotasGeral = 0;
+            decimal totalFolha = 0;
 
-            if (alunos.Any())
+            for (int i = 0; i < escola.Count; i++)
             {
-                double mediaGeral = alunos.Average(a => a.CalcularMedia());
-                Console.WriteLine($"Qtd Alunos: {alunos.Count} | Média Geral das Notas: {mediaGeral:F2}");
+                if (escola[i] is Aluno)
+                {
+                    Aluno a = (Aluno)escola[i];
+                    qtdAlunos++;
+                    somaNotasGeral += a.CalcularMedia();
+                }
+                else if (escola[i] is Professor)
+                {
+                    Professor p = (Professor)escola[i];
+                    qtdProfessores++;
+                    totalFolha += p.Salario;
+                }
             }
-            else Console.WriteLine("Sem dados de alunos.");
 
-            if (professores.Any())
+            if (qtdAlunos > 0)
             {
-                decimal folhaPagamento = professores.Sum(p => p.Salario);
-                Console.WriteLine($"Qtd Professores: {professores.Count} | Total Folha Salarial: {folhaPagamento:C}");
+                double mediaGeral = somaNotasGeral / qtdAlunos;
+                Console.WriteLine("Qtd Alunos: " + qtdAlunos + " | Média Geral das Notas: " + mediaGeral.ToString("F2"));
             }
-            else Console.WriteLine("Sem dados de professores.");
+            else
+            {
+                Console.WriteLine("Sem dados de alunos.");
+            }
+
+            if (qtdProfessores > 0)
+            {
+                Console.WriteLine("Qtd Professores: " + qtdProfessores + " | Total Folha Salarial: R$ " + totalFolha.ToString("F2"));
+            }
+            else
+            {
+                Console.WriteLine("Sem dados de professores.");
+            }
         }
-
 
         static DateTime LerData(string mensagem)
         {

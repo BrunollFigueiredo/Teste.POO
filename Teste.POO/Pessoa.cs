@@ -67,10 +67,28 @@ namespace Teste.POO
 
         public override void ExibirDados()
         {
-            string listaTurmas = Turmas.Count > 0 ? string.Join(", ", Turmas) : "Nenhuma";
-            Console.WriteLine($"[PROF]  Nome: {Nome} | Salário: {Salario:C} | Turmas: {listaTurmas}");
+            string listaTurmas = "";
+
+            if (Turmas.Count > 0)
+            {
+                for (int i = 0; i < Turmas.Count; i++)
+                {
+                    listaTurmas += Turmas[i];
+                    if (i < Turmas.Count - 1)
+                    {
+                        listaTurmas += ", ";
+                    }
+                }
+            }
+            else
+            {
+                listaTurmas = "Nenhuma";
+            }
+
+            Console.WriteLine("[PROF] Nome: " + Nome + " | Salário: R$ " + Salario.ToString("F2") + " | Turmas: " + listaTurmas);
         }
     }
-}
+    }
+
 
 
