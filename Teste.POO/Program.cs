@@ -1,10 +1,12 @@
-﻿using Teste.POO;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Teste.POO;
 
 class Principal
 {
     class Program
     {
-
         static List<Pessoa> escola = new List<Pessoa>();
 
         static void Main(string[] args)
@@ -48,13 +50,11 @@ class Principal
             Console.WriteLine("--- CADASTRO DE ALUNO ---");
             Console.Write("Nome: ");
             string nome = Console.ReadLine();
-            Console.Write("CPF: ");
-            string cpf = Console.ReadLine();
+            string cpf = LerCpf("CPF (somente números): ");
 
             DateTime dataNasc = LerData("Data de Nascimento (dd/mm/aaaa): ");
 
-            Console.Write("Matrícula: ");
-            string matricula = Console.ReadLine();
+            string matricula = LerMatricula("Matrícula (somente números inteiros positivos): ");
 
             Aluno aluno = new Aluno(nome, cpf, dataNasc, matricula);
 
@@ -85,8 +85,7 @@ class Principal
             Console.WriteLine("--- CADASTRO DE PROFESSOR ---");
             Console.Write("Nome: ");
             string nome = Console.ReadLine();
-            Console.Write("CPF: ");
-            string cpf = Console.ReadLine();
+            string cpf = LerCpf("CPF (somente números): ");
 
             DateTime dataNasc = LerData("Data de Nascimento (dd/mm/aaaa): ");
 
@@ -106,7 +105,7 @@ class Principal
                 Console.Write("- Turma: ");
                 string turma = Console.ReadLine();
                 if (turma == "fim" || turma == "FIM") break;
-                if (turma != "" && turma != null) prof.Turmas.Add(turma);
+                if (!string.IsNullOrWhiteSpace(turma)) prof.Turmas.Add(turma);
             }
 
             escola.Add(prof);
@@ -119,12 +118,31 @@ class Principal
             if (escola.Count == 0)
             {
                 Console.WriteLine("Nenhum registro encontrado.");
+
                 return;
+
             }
 
             for (int i = 0; i < escola.Count; i++)
             {
                 escola[i].ExibirDados();
+            }
+            Console.WriteLine($"Deseja excluir algum Registro?");
+            if (int.TryParse(Console.ReadLine(), out int opcao))
+            {
+                if (opcao > 0 && opcao <= escola.Count)
+                {
+                    escola.RemoveAt(opcao - 1);
+                    Console.WriteLine("Registro excluído com sucesso!");
+                }
+                else
+                {
+                    Console.WriteLine("Opção inválida. Nenhum registro foi excluído.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Entrada inválida. Nenhum registro foi excluído.");
             }
         }
 
@@ -183,8 +201,64 @@ class Principal
                 Console.WriteLine("Data inválida.");
             }
         }
+
+        static string LerCpf(string mensagem)
+        {
+            while (true)
+            {
+                Console.Write(mensagem);
+                var input = Console.ReadLine() ?? string.Empty;
+
+                var sb = new System.Text.StringBuilder();
+                foreach (var c in input)
+                    if (char.IsDigit(c)) sb.Append(c);
+
+                var digits = sb.ToString();
+
+                if (digits.Length == 11) return digits;
+
+                Console.WriteLine("CPF inválido. Deve conter 11 dígitos (somente números). Tente novamente.");
+            }
+        }
+
+        static string LerMatricula(string mensagem)
+        {
+            while (true)
+            {
+                Console.Write(mensagem);
+                var input = Console.ReadLine() ?? string.Empty;
+
+                var sb = new System.Text.StringBuilder();
+                foreach (var c in input)
+                    if (char.IsDigit(c)) sb.Append(c);
+
+                var digits = sb.ToString();
+
+                if (string.IsNullOrEmpty(digits))
+                {
+                    Console.WriteLine("Matrícula inválida. Deve conter apenas números. Tente novamente.");
+                    continue;
+                }
+
+                if (long.TryParse(digits, out long valor) && valor > 0)
+                {
+                    return digits; // mantém como string para compatibilidade com a propriedade Matricula
+                }
+
+                Console.WriteLine("Matrícula inválida. Deve ser um número inteiro positivo sem letras. Tente novamente.");
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
 
 
 
